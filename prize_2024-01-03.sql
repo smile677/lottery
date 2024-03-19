@@ -22,6 +22,9 @@ SET NAMES utf8mb4;
 
 # 转储表 card_game
 # ------------------------------------------------------------
+-- 保证有prize数据库
+create database if not exists `prize`;
+use prize;
 
 DROP TABLE IF EXISTS `card_game`;
 
