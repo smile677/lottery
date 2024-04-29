@@ -50,10 +50,33 @@ public class ActController {
     @GetMapping("/info/{gameid}")
     @ApiOperation(value = "缓存信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="gameid",value = "活动id",example = "1",required = true)
+            @ApiImplicitParam(name = "gameid", value = "活动id", example = "1", required = true)
     })
-    public ApiResult info(@PathVariable int gameid){
-        //TODO
-        return null;
+    public ApiResult info(@PathVariable int gameid) {
+        // TODO 此接口测试未通过(原因是get不到redis中的值)
+        log.info("redisUtil.get(RedisKeys.INFO + gameid){}", redisUtil.get(RedisKeys.INFO + gameid));
+        // 取出活动基本信息
+        Map map = new LinkedHashMap<>();
+        map.put(RedisKeys.INFO + gameid, redisUtil.get(RedisKeys.INFO + gameid));
+        log.info("info:{}", map);
+        // 取出临牌桶中令牌 时间:
+        List<Object> tokens = redisUtil.lrange(RedisKeys.TOKENS + gameid, 0, -1);
+        Map tokenMap = new LinkedHashMap();
+        //      对取出令牌桶中的令牌并查询对应的奖品信息
+        tokens.forEach(token -> tokenMap.put(
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(Long.valueOf(token.toString()) / 1000)),
+                redisUtil.get(RedisKeys.TOKEN + gameid + "_" + token))
+        );
+        //      将取出的tokens放入map中
+        map.put(RedisKeys.TOKENS + gameid, tokenMap);
+        log.info("info+token:{}", map);
+        // 最大中奖次数
+        map.put(RedisKeys.MAXGOAL + gameid, redisUtil.hmget(RedisKeys.MAXGOAL + gameid));
+        // 最大可抽奖次数
+        map.put(RedisKeys.MAXENTER + gameid, redisUtil.hmget(RedisKeys.MAXENTER + gameid));
+        // 用户中奖概率
+        map.put(RedisKeys.RANDOMRATE + gameid, redisUtil.hmget(RedisKeys.RANDOMRATE + gameid));
+        log.info("info+tokens+(maxgoal+maxenter+randomrate):{}", map);
+        return new ApiResult(200, "缓存信息", map);
     }
 }
