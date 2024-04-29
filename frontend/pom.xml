@@ -11,6 +11,7 @@
     <groupId>com.itheima.prize</groupId>
     <artifactId>frontend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <!--明该项目为聚合或继承项目-->
     <packaging>pom</packaging>
 
     <modules>
@@ -86,6 +87,10 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 

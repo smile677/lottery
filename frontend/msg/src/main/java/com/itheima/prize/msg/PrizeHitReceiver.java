@@ -12,6 +12,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * 用户中奖后的信息及中的奖品通过该队列投放
+ */
 @Component
 @RabbitListener(queues = RabbitKeys.QUEUE_HIT)
 public class PrizeHitReceiver {
@@ -23,6 +26,6 @@ public class PrizeHitReceiver {
     @RabbitHandler
     public void processMessage(String message) {
         logger.info("user hit : message={}", message);
-        //TODO
+        hitService.save(JSON.parseObject(message, CardUserHit.class));
     }
 }
